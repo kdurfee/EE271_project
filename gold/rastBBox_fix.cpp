@@ -182,23 +182,22 @@ void rastBBox_bbox_fix( u_Poly< long , ushort >& poly ,
 	ll_x = (ll_x >> (r_shift - ss_w_lg2)) << (r_shift -ss_w_lg2 ); 
 	ur_y = (ur_y >> (r_shift - ss_w_lg2)) << (r_shift -ss_w_lg2 ); 
 	ll_y = (ll_y >> (r_shift - ss_w_lg2)) << (r_shift -ss_w_lg2 ); 
+	
 
 	// Clip BBox to visible screen space
 	ur_x = ur_x > screen_w ? screen_w: ur_x;
 	ur_y = ur_y > screen_h ? screen_h: ur_y;
 	ll_x = ll_x < 0 ? 0 : ll_x;
 	ll_y = ll_y < 0 ? 0 : ll_y;
-	
+
 	//set valid only if the bounding box is on the screen
 	//bounding box is never tilted, so can just check vertices
 	//HACK TODO NOTE I dont see this valid used anywhere in the code...
 	valid = (ll_x<=screen_w && ll_y<=screen_h) || //lower left vertice
-	  //upper left vertice
-	  (ll_x<=screen_w && ur_y<=screen_h) ||
-	  //lower right vertice
-	  (ur_x<=screen_w && ll_y <=screen_h) ||
 	  //upper right vertice
-	  (ur_x<=screen_w && ur_y<-screen_h);
+	  (ur_x>=0 && ur_y>=0);
+	
+
 	  
 	//HACK TODO I dont think this is done inside this function
 	//we just determine the bounding box and then the caller does this
@@ -259,57 +258,48 @@ int rastBBox_stest_fix( u_Poly< long , ushort >& poly,
   //if the polygon has 4 sides instead of 3, we can just treat it like it is
   //2 triangles and the point must be in one of them
   //create poly prime, our local modified version of the poly
-  u_Poly < long , ushort > poly_prime;
+  long v[4][2];
   //initialize all to 0 to get rid fo warnings
   for(int i=0;i<4;i++){
-    poly_prime.v[i].x[0]=0;
-    poly_prime.v[i].x[1]=0;
+    v[i][0]=0;
+    v[i][1]=0;
   }
 
   for(int i=0;i<poly.vertices;i++){ //
     //first, shift all the vertices so the sample is at the origin
-    poly_prime.v[i].x[0] = poly.v[i].x[0] - s_x; //center X coordinate of the vertice
-    poly_prime.v[i].x[1] = poly.v[i].x[1] - s_y; //center the Y coordinate of the vertice
+    v[i][0] = poly.v[i].x[0] - s_x; //center X coordinate of the vertice
+    v[i][1] = poly.v[i].x[1] - s_y; //center the Y coordinate of the vertice
   }
 
   //determine distance of origin shifted edges
-  long dist[4];
+  long dist[6];
   //Check the first triangle
-  dist[0]=(poly_prime.v[0].x[0] * poly_prime.v[1].x[1])-(poly_prime.v[1].x[0] * poly_prime.v[0].x[1]);
-  dist[1]=(poly_prime.v[1].x[0] * poly_prime.v[2].x[1])-(poly_prime.v[2].x[0] * poly_prime.v[1].x[1]);
-  dist[2]=(poly_prime.v[2].x[0] * poly_prime.v[0].x[1])-(poly_prime.v[0].x[0] * poly_prime.v[2].x[1]);
+  dist[0]=(v[0][0] * v[1][1])-(v[1][0] * v[0][1]);
+  dist[1]=(v[1][0] * v[2][1])-(v[2][0] * v[1][1]);
+  dist[2]=(v[2][0] * v[3][1])-(v[3][0] * v[2][1]);
+  dist[3]=(v[3][0] * v[0][1])-(v[0][0] * v[3][1]);
+  dist[4]=(v[1][0] * v[3][1])-(v[3][0] * v[1][1]);
+  dist[5]=(v[2][0] * v[0][1])-(v[0][0] * v[2][1]);
   
-  
-  //say the result is a pass by default, and then if any of the dist values
-  //fail to be <= 0, change to a fail and exit and break out of the loop
-  //note, this could be done with one check but this way is clear and less error prone
-  for(int i=0;i<poly.vertices;i++){
-    if(dist[i]<=0.0){
-      result=1;
-    }else{
-      result=0;
-      break;
-    }
+  int b[6];
+  b[0]=dist[0]<=0.0;
+  b[1]=dist[1]<0.0;
+  b[2]=dist[2]<0.0;
+  b[3]=dist[3]<=0.0;
+  b[4]=dist[4]<0.0;
+  b[5]=dist[5]<=0.0;
+
+  if(poly.vertices ==3){
+    result = b[0] && b[1] && b[5];
+  }else if(poly.vertices==4){
+    result = (b[1] && b[2] && !b[4] && (b[0] || b[3]))
+      || (!b[1] && !b[2] && b[4] && (b[0] ^ b[3]))
+      || (b[0] && b[3] && b[4] && (b[1] || b[2]))
+      || (!b[0] && !b[3] && !b[4] && (b[1] ^ b[2]));
+  }else{
+    printf("ERROR: bad vertice # \n");
   }
-  //if the point was not in the first triangle, and we have a polygon then check the second triangle
-  //if it is only a triangle, or the point is in the first triangle we can skip this check
-  //note: definitely more efficient ways of doing this without so much overlap but this is simple
-  if(poly.vertices ==4 && result == 0){
-    //instead of vertex 0, use vertex 3. If the other two vertices stay the same we should get the flipped triangle
-    //that represents the portion of the square we havent tested yet
-    dist[0]=(poly_prime.v[3].x[0] * poly_prime.v[1].x[1])-(poly_prime.v[1].x[0] * poly_prime.v[3].x[1]);
-    dist[1]=(poly_prime.v[1].x[0] * poly_prime.v[2].x[1])-(poly_prime.v[2].x[0] * poly_prime.v[1].x[1]);
-    dist[2]=(poly_prime.v[2].x[0] * poly_prime.v[3].x[1])-(poly_prime.v[3].x[0] * poly_prime.v[2].x[1]);
-    
-    for(int i=0;i<poly.vertices;i++){
-      if(dist[i]<=0.0){
-	result=1;
-      }else{
-	result=0;
-	break;
-      }
-    }
-  }
+
   /////
   ///// Sample Test Function Goes Here
   /////
