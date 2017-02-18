@@ -162,17 +162,40 @@ void rastBBox_bbox_fix( u_Poly< long , ushort >& poly ,
   
   ///// PLACE YOUR CODE HERE
 
-
+  //// MAYANK
+	int vertices = poly.vertices;
+	
+  // Setting Bounds - 
+	ur_x = poly.v[i].x[0];
+	ll_x = poly.v[i].x[0];
+	ur_y = poly.v[i].x[1];
+	ll_y = poly.v[i].x[1];
+	
+    for(int i=1;i<vertices;i++) {
+		ur_x = ur_x < poly.v[i].x[0] ? poly.v[i].x[0] : ur_x;
+		ll_x = ll_x > poly.v[i].x[0] ? poly.v[i].x[0] : ll_x;
+		ur_y = ur_y < poly.v[i].x[1] ? poly.v[i].x[1] : ur_y;
+		ll_y = ll_y > poly.v[i].x[1] ? poly.v[i].x[1] : ll_y;
+	}
+  
+  // FLOOR_SS function needs to be implemented on the above 4
   
   
   
-  
-  
-
+  // Clip BBox to visible screen space
+    ur_x = ur_x > screen_w ? screen_w: ur_x;
+	ur_y = ur_y > screen_h ? screen_h: ur_y;
+	ll_x = ll_x < 0 ? 0 : ll_x;
+	ll_y = ll_y < 0 ? 0 : ll_y;
+	
   /////
   ///// Bounding Box Function Goes Here
   ///// 
+  for(long sl_x = ll_x; sl_x <= ur_x; sl_x += subsample_width ) {
+	  for(long sl_y=ll_y; sl_y<=ll_y; sl_y+=subsample_width) {
 
+	  }
+  }
 
 }
 
