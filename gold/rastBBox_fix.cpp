@@ -255,9 +255,7 @@ int rastBBox_stest_fix( u_Poly< long , ushort >& poly,
   ///// PLACE YOUR CODE HERE
   
   //NOTE
-  //if the polygon has 4 sides instead of 3, we can just treat it like it is
-  //2 triangles and the point must be in one of them
-  //create poly prime, our local modified version of the poly
+
   long v[4][2];
   //initialize all to 0 to get rid fo warnings
   for(int i=0;i<4;i++){

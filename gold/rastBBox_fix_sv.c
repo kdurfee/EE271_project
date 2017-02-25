@@ -52,9 +52,39 @@ int rastBBox_bbox_check( int   v0_x,     //uPoly
   //Copy Past C++ Bounding Box Function ****BEGIN****
   //
   // note that bool,true, and false are not in c
+	int vertices = poly.vertices;
+	//use default as first vertice
+	ll_x=poly.v[0].x[0];
+	ur_x=poly.v[0].x[0];
+	ll_y=poly.v[0].x[1];
+	ur_y=poly.v[0].x[1];
+	//find min and max x and y coordinates for all vertices
+	for(int i=1;i<vertices;i++) {
+	  ur_x = ur_x < poly.v[i].x[0] ? poly.v[i].x[0] : ur_x;
+	  ll_x = ll_x > poly.v[i].x[0] ? poly.v[i].x[0] : ll_x;
+	  ur_y = ur_y < poly.v[i].x[1] ? poly.v[i].x[1] : ur_y;
+	  ll_y = ll_y > poly.v[i].x[1] ? poly.v[i].x[1] : ll_y;
+	}
+	//round down to subsample grid
+	//   rounded_value = ( val >> ( r_shift - ss_w_lg2 )) << ( r_shift -ss_w_lg2 ); 
+	ur_x = (ur_x >> (r_shift - ss_w_lg2)) << (r_shift -ss_w_lg2 ); 
+	ll_x = (ll_x >> (r_shift - ss_w_lg2)) << (r_shift -ss_w_lg2 ); 
+	ur_y = (ur_y >> (r_shift - ss_w_lg2)) << (r_shift -ss_w_lg2 ); 
+	ll_y = (ll_y >> (r_shift - ss_w_lg2)) << (r_shift -ss_w_lg2 ); 
+	
 
+	// Clip BBox to visible screen space
+	ur_x = ur_x > screen_w ? screen_w: ur_x;
+	ur_y = ur_y > screen_h ? screen_h: ur_y;
+	ll_x = ll_x < 0 ? 0 : ll_x;
+	ll_y = ll_y < 0 ? 0 : ll_y;
 
-			  
+	//set valid only if the bounding box is on the screen
+	//bounding box is never tilted, so can just check vertices
+	//HACK TODO NOTE I dont see this valid used anywhere in the code...
+	valid = (ll_x<=screen_w && ll_y<=screen_h) || //lower left vertice
+	  //upper right vertice
+	  (ur_x>=0 && ur_y>=0);				  
 
   //
   //Copy Past C++ Bounding Box Function ****END****
@@ -142,6 +172,46 @@ int rastBBox_stest_check( int   v0_x,      //uPoly
   //
   // note that bool,true, and false are not in c
 
+  long v[4][2];
+  //initialize all to 0 to get rid fo warnings
+  for(int i=0;i<4;i++){
+    v[i][0]=0;
+    v[i][1]=0;
+  }
+
+  for(int i=0;i<poly.vertices;i++){ //
+    //first, shift all the vertices so the sample is at the origin
+    v[i][0] = poly.v[i].x[0] - s_x; //center X coordinate of the vertice
+    v[i][1] = poly.v[i].x[1] - s_y; //center the Y coordinate of the vertice
+  }
+
+  //determine distance of origin shifted edges
+  long dist[6];
+  //Check the first triangle
+  dist[0]=(v[0][0] * v[1][1])-(v[1][0] * v[0][1]);
+  dist[1]=(v[1][0] * v[2][1])-(v[2][0] * v[1][1]);
+  dist[2]=(v[2][0] * v[3][1])-(v[3][0] * v[2][1]);
+  dist[3]=(v[3][0] * v[0][1])-(v[0][0] * v[3][1]);
+  dist[4]=(v[1][0] * v[3][1])-(v[3][0] * v[1][1]);
+  dist[5]=(v[2][0] * v[0][1])-(v[0][0] * v[2][1]);
+  
+  int b[6];
+  b[0]=dist[0]<=0.0;
+  b[1]=dist[1]<0.0;
+  b[2]=dist[2]<0.0;
+  b[3]=dist[3]<=0.0;
+  b[4]=dist[4]<0.0;
+  b[5]=dist[5]<=0.0;
+
+  if(poly.vertices ==3){
+    result = b[0] && b[1] && b[5];
+  }else if(poly.vertices==4){
+    result = (b[1] && b[2] && !b[4] && (b[0] || b[3]))
+      || (!b[1] && !b[2] && b[4] && (b[0] ^ b[3]))
+      || (b[0] && b[3] && b[4] && (b[1] || b[2]))
+      || (!b[0] && !b[3] && !b[4] && (b[1] ^ b[2]));
+  }
+
   
 
   //
@@ -194,14 +264,40 @@ int rastBBox_check( int   v0_x,      //uPoly
   //Copy Past C++ Bounding Box Function ****BEGIN****
   //
   // note that bool,true, and false are not in c
+	int vertices = poly.vertices;
+	//use default as first vertice
+	ll_x=poly.v[0].x[0];
+	ur_x=poly.v[0].x[0];
+	ll_y=poly.v[0].x[1];
+	ur_y=poly.v[0].x[1];
+	//find min and max x and y coordinates for all vertices
+	for(int i=1;i<vertices;i++) {
+	  ur_x = ur_x < poly.v[i].x[0] ? poly.v[i].x[0] : ur_x;
+	  ll_x = ll_x > poly.v[i].x[0] ? poly.v[i].x[0] : ll_x;
+	  ur_y = ur_y < poly.v[i].x[1] ? poly.v[i].x[1] : ur_y;
+	  ll_y = ll_y > poly.v[i].x[1] ? poly.v[i].x[1] : ll_y;
+	}
+	//round down to subsample grid
+	//   rounded_value = ( val >> ( r_shift - ss_w_lg2 )) << ( r_shift -ss_w_lg2 ); 
+	ur_x = (ur_x >> (r_shift - ss_w_lg2)) << (r_shift -ss_w_lg2 ); 
+	ll_x = (ll_x >> (r_shift - ss_w_lg2)) << (r_shift -ss_w_lg2 ); 
+	ur_y = (ur_y >> (r_shift - ss_w_lg2)) << (r_shift -ss_w_lg2 ); 
+	ll_y = (ll_y >> (r_shift - ss_w_lg2)) << (r_shift -ss_w_lg2 ); 
+	
 
+	// Clip BBox to visible screen space
+	ur_x = ur_x > screen_w ? screen_w: ur_x;
+	ur_y = ur_y > screen_h ? screen_h: ur_y;
+	ll_x = ll_x < 0 ? 0 : ll_x;
+	ll_y = ll_y < 0 ? 0 : ll_y;
 
-  
-  
-  
-  
-  
-  
+	//set valid only if the bounding box is on the screen
+	//bounding box is never tilted, so can just check vertices
+	//HACK TODO NOTE I dont see this valid used anywhere in the code...
+	valid = (ll_x<=screen_w && ll_y<=screen_h) || //lower left vertice
+	  //upper right vertice
+	  (ur_x>=0 && ur_y>=0);
+    
 
   //
   //Copy Past C++ Bounding Box Function ****END****
@@ -225,18 +321,45 @@ int rastBBox_check( int   v0_x,      //uPoly
       //Copy Past C++ Sample Test Function ****BEGIN****
       //
       // note that bool,true, and false are not in c
-      
+        long v[4][2];
+  //initialize all to 0 to get rid fo warnings
+  for(int i=0;i<4;i++){
+    v[i][0]=0;
+    v[i][1]=0;
+  }
 
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
+  for(int i=0;i<poly.vertices;i++){ //
+    //first, shift all the vertices so the sample is at the origin
+    v[i][0] = poly.v[i].x[0] - s_x; //center X coordinate of the vertice
+    v[i][1] = poly.v[i].x[1] - s_y; //center the Y coordinate of the vertice
+  }
+
+  //determine distance of origin shifted edges
+  long dist[6];
+  //Check the first triangle
+  dist[0]=(v[0][0] * v[1][1])-(v[1][0] * v[0][1]);
+  dist[1]=(v[1][0] * v[2][1])-(v[2][0] * v[1][1]);
+  dist[2]=(v[2][0] * v[3][1])-(v[3][0] * v[2][1]);
+  dist[3]=(v[3][0] * v[0][1])-(v[0][0] * v[3][1]);
+  dist[4]=(v[1][0] * v[3][1])-(v[3][0] * v[1][1]);
+  dist[5]=(v[2][0] * v[0][1])-(v[0][0] * v[2][1]);
   
+  int b[6];
+  b[0]=dist[0]<=0.0;
+  b[1]=dist[1]<0.0;
+  b[2]=dist[2]<0.0;
+  b[3]=dist[3]<=0.0;
+  b[4]=dist[4]<0.0;
+  b[5]=dist[5]<=0.0;
+
+  if(poly.vertices ==3){
+    result = b[0] && b[1] && b[5];
+  }else if(poly.vertices==4){
+    result = (b[1] && b[2] && !b[4] && (b[0] || b[3]))
+      || (!b[1] && !b[2] && b[4] && (b[0] ^ b[3]))
+      || (b[0] && b[3] && b[4] && (b[1] || b[2]))
+      || (!b[0] && !b[3] && !b[4] && (b[1] ^ b[2]));
+  } 
       //
       //Copy Past C++ Sample Test Function ****END****
       //
