@@ -120,7 +120,7 @@ module  `mname()`
    // Signals in Access Order 
 
    //////// DECLARE OTHER INTERMEDIATE SIGNALS YOU NEED
-
+   logic signed b[`$edges`-1:0]; // left vs right culling
 
    //; if( $verts == 3 ) {
 
@@ -135,7 +135,7 @@ module  `mname()`
    //; for( my $i = 0 ; $i < $verts ; $i++ ) {
    //;  for( my $j = 0 ; $j < 2 ; $j++ ) {
    always_comb begin
-      poly_shift_R16S[`$i`][`$j`] = 
+      poly_shift_R16S[`$i`][`$j`] = poly_R16H[`$i`][`$j`]-sampleR16H[`$i`][`$j`];
    end
    //;  }
    //; }
@@ -143,18 +143,54 @@ module  `mname()`
    //// (2) Organize edges (form three edges for triangles)
 
    always_comb begin
-     // assign edge_R16S
+   //edge 0 start vertice
+   	  //X
+   	   edge_R16S[0][0][0]= poly_shift_R16S[0][0];
+	  //Y
+   	   edge_R16S[0][0][1]= poly_shift_R16S[0][1];
+   //edge 0 end vertice
+   	  //X
+   	   edge_R16S[0][1][0]= poly_shift_R16S[1][0];
+	  //Y
+   	   edge_R16S[0][1][1]= poly_shift_R16S[1][0];
+//edge 1 start vertice
+   	  //X
+   	   edge_R16S[1][0][0]= poly_shift_R16S[0][0];
+	  //Y
+   	   edge_R16S[1][0][1]= poly_shift_R16S[0][1];
+   //edge 1 end vertice
+   	  //X
+   	   edge_R16S[1][1][0]= poly_shift_R16S[2][0];
+	  //Y
+   	   edge_R16S[1][1][1]= poly_shift_R16S[2][1];
+
+	  //edge 2 start vertice
+   	  //X
+   	   edge_R16S[2][0][0]= poly_shift_R16S[1][0];
+	  //Y
+   	   edge_R16S[2][0][1]= poly_shift_R16S[1][1];
+   //edge 2 end vertice
+   	  //X
+   	   edge_R16S[2][1][0]= poly_shift_R16S[2][0];
+	  //Y
+   	   edge_R16S[2][1][1]= poly_shift_R16S[2][1];
    end
 
    //// (3) Calculate distance x_1 * y_2 - x_2 * y_1
 
    always_comb begin
-     // assign dist_lg_R16S
+   	        dist_lg_R16S[0]=(edge_R16S[0][0][0] * edge_R16S[0][1][1])-(edge_R16S[0][1][0]*edge_R16S[0][0][1]);
+   	        dist_lg_R16S[1]=(edge_R16S[1][0][0] * edge_R16S[1][1][1])-(edge_R16S[1][1][0]*edge_R16S[1][0][1]);
+   	        dist_lg_R16S[2]=(edge_R16S[2][0][0] * edge_R16S[2][1][1])-(edge_R16S[2][1][0]*edge_R16S[2][0][1]);
    end   
 
    //// (4) Check distance and assign hit_valid_R16H.
 
    always_comb begin
+   	       b[0] =  dist_lg_R16S[0] <=0;
+   	       b[1] =  dist_lg_R16S[1] <0;
+   	       b[2] =  dist_lg_R16S[2] <=0;
+   	       hit_valid_R16H = &b;
      // assign hit_valid_R16H
    end   
 

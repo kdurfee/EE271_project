@@ -185,7 +185,11 @@ module `mname()`
    logic 				outvalid_R10H;               // output is valid
    
    //////// DECLARE OTHER SIGNALS YOU NEED
-
+   logic one_hot_max_x[2:0];
+   logic one_hot_max_y[2:0];
+   logic one_hot_min_x[2:0];
+   logic one_hot_min_y[2:0];
+   logic radix_mask[3:0];
    //R10 Signals
    
    // output for retiming registers
@@ -214,8 +218,70 @@ module `mname()`
     * */
 
    //; if( $verts == 3 ) {
-
+   //mux for max X
+   one_hot_max_x[0] = poly_R10S[0][0]>= poly_R10S[0][1] && poly_R10S[0][0]>=poly_R10S[0][2];
+   one_hot_max_x[1] = poly_R10S[0][1]> poly_R10S[0][0] && poly_R10S[0][1]>poly_R10S[0][2];
+   one_hot_max_x[2] = poly_R10S[0][2]> poly_R10S[0][1] && poly_R10S[0][2]>poly_R10S[0][0];
    always_comb begin
+   	       unique case(one_hot_max_x)
+	       	      3'b001:begin
+			box_R10S[1][0]=poly_R10S[0][0];
+		      end
+		      3'b010:begin
+			box_R10S[1][0]=poly_R10S[0][1];
+		      end		      
+		      3'b100:begin
+			box_R10S[1][0]=poly_R10S[0][2];
+		      end
+	       endcase
+	       //Mux for min X
+   one_hot_min_x[0] = poly_R10S[0][0]<= poly_R10S[0][1] && poly_R10S[0][0]<=poly_R10S[0][2];
+   one_hot_min_x[1] = poly_R10S[0][1]< poly_R10S[0][0] && poly_R10S[0][1]<poly_R10S[0][2];
+   one_hot_min_x[2] = poly_R10S[0][2]< poly_R10S[0][1] && poly_R10S[0][2]<poly_R10S[0][0];
+   always_comb begin
+   	       unique case(one_hot_min_x)
+	       	      3'b001:begin
+			box_R10S[0][0]=poly_R10S[0][0];
+		      end
+		      3'b010:begin
+			box_R10S[0][0]=poly_R10S[0][1];
+		      end		      
+		      3'b100:begin
+			box_R10S[0][0]=poly_R10S[0][2];
+		      end
+	       endcase
+	       //Mux for Max Y
+   one_hot_max_y[0] = poly_R10S[1][0]>= poly_R10S[1][1] && poly_R10S[1][0]>=poly_R10S[1][2];
+   one_hot_max_y[1] = poly_R10S[1][1]> poly_R10S[1][0] && poly_R10S[1][1]>poly_R10S[1][2];
+   one_hot_max_y[2] = poly_R10S[1][2]> poly_R10S[1][1] && poly_R10S[1][2]>poly_R10S[1][0];
+   always_comb begin
+   	       unique case(one_hot_max_y)
+	       	      3'b001:begin
+			box_R10S[1][1]=poly_R10S[1][0];
+		      end
+		      3'b010:begin
+			box_R10S[1][1]=poly_R10S[1][1];
+		      end		      
+		      3'b100:begin
+			box_R10S[1][1]=poly_R10S[1][2];
+		      end
+	       endcase
+	       //Mux for Min Y
+   one_hot_min_y[0] = poly_R10S[1][0]<= poly_R10S[1][1] && poly_R10S[1][0]<=poly_R10S[1][2];
+   one_hot_min_y[1] = poly_R10S[1][1]< poly_R10S[1][0] && poly_R10S[1][1]<poly_R10S[1][2];
+   one_hot_min_y[2] = poly_R10S[1][2]< poly_R10S[1][1] && poly_R10S[1][2]<poly_R10S[1][0];
+   always_comb begin
+   	       unique case(one_hot_min_y)
+	       	      3'b001:begin
+			box_R10S[0][1]=poly_R10S[1][0];
+		      end
+		      3'b010:begin
+			box_R10S[0][1]=poly_R10S[1][1];
+		      end		      
+		      3'b100:begin
+			box_R10S[0][1]=poly_R10S[1][2];
+		      end
+	       endcase
 
    //////// PLACE YOUR CODE HERE
    //////// ASSIGN VALUES TO "box_R10S"
@@ -252,12 +318,26 @@ module `mname()`
    always_comb begin
       
       //Integer Portion of LL and UR Remains the Same 
-      rounded_box_R10S[`$i`][`$j`][`$sig_fig`-1:`$radix`] 
-     = box_R10S[`$i`][`$j`][`$sig_fig`-1:`$radix`];
+      rounded_box_R10S[`$i`][`$j`][`$sig_fig`-1:`$radix`] = box_R10S[`$i`][`$j`][`$sig_fig`-1:`$radix`];
 
       //////// PLACE YOUR CODE HERE
       //////// ASSIGN FRACTION PORTION
-
+      unique case (subSample_RnnnnU)
+      	     case 4'b1000:begin
+	                radix_mask= {(`$radix'-3){1'b1},3'b000};
+	     end	     
+      	     case 4'b0100:begin
+	                radix_mask= {(`$radix'-3){1'b1},3'b100};
+	     end	     
+      	     case 4'b0010:begin
+	                radix_mask= {(`$radix'-3){1'b1},3'b110};
+	     end	     
+      	     case 4'b0001:begin
+	                radix_mask= {(`$radix'-3){1'b1},3'b111};
+	     end	     
+      endcase
+      
+      rounded_box_R10S[`$i`][`$j`][`$radix`-1:0] = box_R10S[`$i`][`$j`][`$radix`-1:0] & radix_mask;
       
    end // always_comb
 
@@ -279,7 +359,13 @@ module `mname()`
 
       //////// PLACE YOUR CODE HERE
       //////// ASSIGN "out_box_R10S" and "outvalid_R10H"
+      out_box_R10S[0][0] = rounded_box_R10S[0][0] > screen_RnnnnS[0] ? screen_RnnnnS[0] : rounded_box_R10S[0][0];
+      out_box_R10S[0][1] = rounded_box_R10S[0][1] > screen_RnnnnS[1] ? screen_RnnnnS[1] : rounded_box_R10S[0][1];
+      out_box_R10S[1][0] = rounded_box_R10S[1][0] < 0 ? 0 : rounded_box_R10S[1][0];
+      out_box_R10S[1][1] = rounded_box_R10S[1][1] < 0 ? 0 : rounded_box_R10S[1][1];
 
+      outvalid_R10H = ((out_box_R10S[1][0]<=screen_RnnnnS[0]) && (out_box_R10S[1][1]<=screen_RnnnnS[1])) || ((out_box_R10S[0][0]>=0) && (out_box_R10S[0][1]>=0));
+      
    end
 
    // ***************** End of Step 3 *********************
