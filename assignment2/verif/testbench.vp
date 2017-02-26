@@ -178,7 +178,6 @@ module `mname()`
 		   .box_R13S(`$dut_obj->get_instance_path()`.box_R13S),		// Input: Bound Box
 		   .validPoly_R13H(`$dut_obj->get_instance_path()`.validPoly_R13H) ,  // Input: Valid Data for Operation
 		   .isQuad_R13H(`$dut_obj->get_instance_path()`.isQuad_R13H) ,        // Input: Is Poly Quad?
-			       .invalidate_R10H(`$dut_obj->get_instance_path()`.bbox.invalidate_R10H),
 		   
 		   .clk(clk),                                   // Input: Clock 
 		   .rst(rst),                                   // Input: Reset
