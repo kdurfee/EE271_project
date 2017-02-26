@@ -185,12 +185,7 @@ module `mname()`
    logic 				outvalid_R10H;               // output is valid
    
    //////// DECLARE OTHER SIGNALS YOU NEED
-   bit one_hot_max_x[2:0];
-   bit one_hot_max_y[2:0];
-   bit one_hot_min_x[2:0];
-   bit one_hot_min_y[2:0];
-   bit radix_mask[`$radix-1`:0];
-   logic radix_mask_msb;
+   logic [`$radix-1`:0] radix_mask;
    //R10 Signals
    
    // output for retiming registers
@@ -224,61 +219,61 @@ module `mname()`
    //////// ASSIGN VALUES TO "box_R10S"
    always_comb begin
    
-   if(poly_R10S[0][0]>= poly_R10S[0][1]) begin
-		if(poly_R10S[0][0]>= poly_R10S[0][2]) begin	//max X
+   if(poly_R10S[0][0]>= poly_R10S[1][0]) begin
+		if(poly_R10S[0][0]>= poly_R10S[2][0]) begin	//max X
 			box_R10S[1][0]=poly_R10S[0][0];
 		end
 		else begin
-			box_R10S[1][0]=poly_R10S[0][2];
+			box_R10S[1][0]=poly_R10S[2][0];
 		end
-		if(poly_R10S[0][1] > poly_R10S[0][2]) begin	//min X
-			box_R10S[0][0]=poly_R10S[0][2];
+		if(poly_R10S[1][0] > poly_R10S[2][0]) begin	//min X
+			box_R10S[0][0]=poly_R10S[2][0];
 		end
 		else begin
-			box_R10S[0][0]=poly_R10S[0][1];
+			box_R10S[0][0]=poly_R10S[1][0];
 		end
    end 
    else begin
-		if(poly_R10S[0][1] >= poly_R10S[0][2]) begin	//max X
-			box_R10S[1][0]=poly_R10S[0][1];
+		if(poly_R10S[1][0] >= poly_R10S[2][0]) begin	//max X
+			box_R10S[1][0]=poly_R10S[1][0];
 		end
 		else begin
-			box_R10S[1][0]=poly_R10S[0][2];
+			box_R10S[1][0]=poly_R10S[2][0];
 		end
-		if(poly_R10S[0][0] > poly_R10S[0][2]) begin	//min X
-			box_R10S[0][0]=poly_R10S[0][2];
+		if(poly_R10S[0][0] > poly_R10S[2][0]) begin	//min X
+			box_R10S[0][0]=poly_R10S[2][0];
 		end
 		else begin
 			box_R10S[0][0]=poly_R10S[0][0];
 		end   
    end
 
-   if(poly_R10S[1][0]>= poly_R10S[1][1]) begin
-		if(poly_R10S[1][0]>= poly_R10S[1][2]) begin	//max y
-			box_R10S[1][1]=poly_R10S[1][0];
+   if(poly_R10S[0][1]>= poly_R10S[1][1]) begin
+		if(poly_R10S[0][1]>= poly_R10S[2][1]) begin	//max y
+			box_R10S[1][1]=poly_R10S[0][1];
 		end
 		else begin
-			box_R10S[1][1]=poly_R10S[0][2];
+			box_R10S[1][1]=poly_R10S[2][1];
 		end
-		if(poly_R10S[1][1] > poly_R10S[1][2]) begin	//min y
-			box_R10S[0][1]=poly_R10S[1][2];
+		if(poly_R10S[1][1] > poly_R10S[2][1]) begin	//min y
+			box_R10S[0][1]=poly_R10S[2][1];
 		end
 		else begin
 			box_R10S[0][1]=poly_R10S[1][1];
 		end
    end 
    else begin
-		if(poly_R10S[1][1] >= poly_R10S[1][2]) begin	//max y
+		if(poly_R10S[1][1] >= poly_R10S[2][1]) begin	//max y
 			box_R10S[1][1]=poly_R10S[1][1];
 		end
 		else begin
-			box_R10S[1][1]=poly_R10S[1][2];
+			box_R10S[1][1]=poly_R10S[2][1];
 		end
-		if(poly_R10S[1][0] > poly_R10S[1][2]) begin	//min y
-			box_R10S[0][1]=poly_R10S[1][2];
+		if(poly_R10S[0][1] > poly_R10S[2][1]) begin	//min y
+			box_R10S[0][1]=poly_R10S[2][1];
 		end
 		else begin
-			box_R10S[0][1]=poly_R10S[1][0];
+			box_R10S[0][1]=poly_R10S[0][1];
 		end   
    end
  
@@ -310,16 +305,16 @@ module `mname()`
 //    radix_mask_msb= {(`$radix`-3){1'b1}};
     unique case (subSample_RnnnnU)
       	     4'b1000:begin
-	                radix_mask= {4'b1000, `$radix-4`'b0};//
+	                radix_mask= {4'b0000, `$radix-4`'d0};
 	     end	     
       	     4'b0100:begin
-	                radix_mask= {4'b1100, `$radix-4`'b0};
+	                radix_mask= {4'b1000, `$radix-4`'d0};
 	     end	     
       	     4'b0010:begin
-	                radix_mask= {4'b1110, `$radix-4`'b0};
+	                radix_mask= {4'b1100, `$radix-4`'d0};
 	     end	     
       	     4'b0001:begin
-	                radix_mask= {4'b1111, `$radix-4`'b0};
+	                radix_mask= {4'b1110, `$radix-4`'d0};
 	     end	     
       endcase
    end
@@ -356,17 +351,17 @@ module `mname()`
 
       //////// PLACE YOUR CODE HERE
       //////// ASSIGN "out_box_R10S" and "outvalid_R10H"
-      out_box_R10S[0][0] = rounded_box_R10S[0][0] > screen_RnnnnS[0] ? screen_RnnnnS[0] : rounded_box_R10S[0][0];
-      out_box_R10S[0][1] = rounded_box_R10S[0][1] > screen_RnnnnS[1] ? screen_RnnnnS[1] : rounded_box_R10S[0][1];
-      out_box_R10S[1][0] = rounded_box_R10S[1][0] < 0 ? 0 : rounded_box_R10S[1][0];
-      out_box_R10S[1][1] = rounded_box_R10S[1][1] < 0 ? 0 : rounded_box_R10S[1][1];
-
-      //outvalid_R10H = validPoly_R10H && ((out_box_R10S[1][0]<=screen_RnnnnS[0]) && (out_box_R10S[1][1]<=screen_RnnnnS[1])) || ((out_box_R10S[0][0]>=0) && (out_box_R10S[0][1]>=0));
-      //Lower left X muxt be less = than max X
-      //lower left Y must be less = than max Y
-      //upper right X must be greater = than 0
-      //upper right Y must be greater = than 0
-      outvalid_R10H = validPoly_R10H && out_box_R10S[0][0]<=screen_RnnnnS[0] && out_box_R10S[0][1]<=screen_RnnnnS[1] && out_box_R10S[1][0]>=0 && out_box_R10S[1][1]>=0;
+      //if lower left X is < 0, set to 0
+      out_box_R10S[0][0] = rounded_box_R10S[0][0] < 0 ? 0 : rounded_box_R10S[0][0];
+      //if lower left Y is < 0, set to 0
+      out_box_R10S[0][1] = rounded_box_R10S[0][1] < 0  ? 0 : rounded_box_R10S[0][1];
+      //if upper right X is > screen width, clip to screen width
+      out_box_R10S[1][0] = rounded_box_R10S[1][0] > screen_RnnnnS[0] ? screen_RnnnnS[0] : rounded_box_R10S[1][0];
+      //if upper right Y is > screen height, clip to screen height
+      out_box_R10S[1][1] = rounded_box_R10S[1][1] > screen_RnnnnS[1] ? screen_RnnnnS[1] : rounded_box_R10S[1][1];
+      //the output is valid only if the min values are inside the max bounds
+      //and the max values are inside the min bounds
+      outvalid_R10H = validPoly_R10H && ((out_box_R10S[0][0]<=screen_RnnnnS[0]) && (out_box_R10S[0][1]<=screen_RnnnnS[1])) && ((out_box_R10S[1][0]>=0) && (out_box_R10S[1][1]>=0));
       
    end
 

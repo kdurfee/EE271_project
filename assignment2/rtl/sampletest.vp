@@ -120,7 +120,7 @@ module  `mname()`
    // Signals in Access Order 
 
    //////// DECLARE OTHER INTERMEDIATE SIGNALS YOU NEED
-   logic signed b[`$edges`-1:0]; // left vs right culling
+   logic [`$edges`-1:0] b; // left vs right culling
 
    //; if( $verts == 3 ) {
 
@@ -152,7 +152,7 @@ module  `mname()`
    	  //X
    	   edge_R16S[0][1][0]= poly_shift_R16S[1][0];
 	  //Y
-   	   edge_R16S[0][1][1]= poly_shift_R16S[1][0];
+   	   edge_R16S[0][1][1]= poly_shift_R16S[1][1];
 //edge 1 start vertice
    	  //X
    	   edge_R16S[1][0][0]= poly_shift_R16S[0][0];

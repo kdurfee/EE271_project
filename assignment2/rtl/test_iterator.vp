@@ -260,8 +260,9 @@ module `mname()`
    
    ////// PLACE YOUR CODE HERE
    assign next_up_samp_R14S[0] = 0;	
-   assign next_up_samp_R14S[1] = sample_R14S[1] + {subSample_RnnnnU,{(`$radix`-4){1'b0}}};
-   assign next_rt_samp_R14S[0] = sample_R14S[0] + {subSample_RnnnnU,{(`$radix`-4){1'b0}}};
+   //top bit of 4 bit subSample is shifted up one to LSB of non radix portion
+   assign next_up_samp_R14S[1] = sample_R14S[1] + {subSample_RnnnnU,{(`$radix`-3){1'b0}}};
+   assign next_rt_samp_R14S[0] = sample_R14S[0] + {subSample_RnnnnU,{(`$radix`-3){1'b0}}};
    assign next_rt_samp_R14S[1] = sample_R14S[1];
    assign at_right_edg_R14H= sample_R14S[0] >= box_R13S[1][0];
    assign at_top_edg_R14H= sample_R14S[1] >= box_R13S[1][1];
@@ -283,13 +284,13 @@ module `mname()`
       unique case( state_R14H )
         ( WAIT_STATE ): begin
 	   next_sample_R14S    = box_R13S[0];
-	   next_validSamp_R14H = validPoly_R13H;
+	   next_validSamp_R14H = validPoly_R13H;	   
 	   next_isQuad_R14H    = isQuad_R13H;
-	   next_state_R14H     = validPoly_R13H ? TEST_STATE : WAIT_STATE;
+	   next_state_R14H     = validPoly_R13H ? TEST_STATE : WAIT_STATE; //if we get something valid jump to test
 	   next_poly_R14S      = poly_R13S;
 	   next_color_R14U     = color_R13U;
 	   next_box_R14S       = box_R13S;
-	   next_halt_RnnnnL    = 1'b0;
+	   next_halt_RnnnnL    = validPoly_R13H; //if we get something valid, halt and jump to test state
 	end
 	( TEST_STATE ): begin
 	   next_sample_R14S    = at_right_edg_R14H ? next_up_samp_R14S : next_rt_samp_R14S;
@@ -299,7 +300,7 @@ module `mname()`
 	   next_poly_R14S      = poly_R14S;
 	   next_color_R14U     = color_R14U;
 	   next_box_R14S       = box_R14S;
-	   next_halt_RnnnnL    = (~at_end_box_R14H);  
+	   next_halt_RnnnnL    = (~at_end_box_R14H);  //halt the pipeline until done processing
 	end      
       endcase // case ( state_R14H )
       
