@@ -290,7 +290,7 @@ module `mname()`
 	   next_poly_R14S      = poly_R13S;
 	   next_color_R14U     = color_R13U;
 	   next_box_R14S       = box_R13S;
-	   next_halt_RnnnnL    = validPoly_R13H; //if we get something valid, halt and jump to test state
+	   next_halt_RnnnnL    = ~validPoly_R13H; //if we get something valid, halt and jump to test state
 	end
 	( TEST_STATE ): begin
 	   next_sample_R14S    = at_right_edg_R14H ? next_up_samp_R14S : next_rt_samp_R14S;
@@ -300,7 +300,7 @@ module `mname()`
 	   next_poly_R14S      = poly_R14S;
 	   next_color_R14U     = color_R14U;
 	   next_box_R14S       = box_R14S;
-	   next_halt_RnnnnL    = (~at_end_box_R14H);  //halt the pipeline until done processing
+	   next_halt_RnnnnL    = (at_end_box_R14H);  //halt the pipeline until done processing
 	end      
       endcase // case ( state_R14H )
       
