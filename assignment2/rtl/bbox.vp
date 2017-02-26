@@ -185,11 +185,11 @@ module `mname()`
    logic 				outvalid_R10H;               // output is valid
    
    //////// DECLARE OTHER SIGNALS YOU NEED
-   logic one_hot_max_x[2:0];
-   logic one_hot_max_y[2:0];
-   logic one_hot_min_x[2:0];
-   logic one_hot_min_y[2:0];
-   logic radix_mask[3:0];
+   bit one_hot_max_x[2:0];
+   bit one_hot_max_y[2:0];
+   bit one_hot_min_x[2:0];
+   bit one_hot_min_y[2:0];
+   bit radix_mask[`$radix-1`:0];
    logic radix_mask_msb;
    //R10 Signals
    
@@ -223,73 +223,65 @@ module `mname()`
    //////// PLACE YOUR CODE HERE
    //////// ASSIGN VALUES TO "box_R10S"
    always_comb begin
-   //mux for max X
-   one_hot_max_x[0] = poly_R10S[0][0]>= poly_R10S[0][1] && poly_R10S[0][0]>=poly_R10S[0][2];
-   one_hot_max_x[1] = poly_R10S[0][1]> poly_R10S[0][0] && poly_R10S[0][1]>poly_R10S[0][2];
-   one_hot_max_x[2] = poly_R10S[0][2]> poly_R10S[0][1] && poly_R10S[0][2]>poly_R10S[0][0];
-   	       unique case(one_hot_max_x)
-	       	      3'b001:begin
+   
+   if(poly_R10S[0][0]>= poly_R10S[0][1]) begin
+		if(poly_R10S[0][0]>= poly_R10S[0][2]) begin	//max X
 			box_R10S[1][0]=poly_R10S[0][0];
-		      end
-		      3'b010:begin
-			box_R10S[1][0]=poly_R10S[0][1];
-		      end		      
-		      3'b100:begin
+		end
+		else begin
 			box_R10S[1][0]=poly_R10S[0][2];
-		      end
-	       endcase
-   end
-   //Mux for min X
-   always_comb begin
-   one_hot_min_x[0] = poly_R10S[0][0]<= poly_R10S[0][1] && poly_R10S[0][0]<=poly_R10S[0][2];
-   one_hot_min_x[1] = poly_R10S[0][1]< poly_R10S[0][0] && poly_R10S[0][1]<poly_R10S[0][2];
-   one_hot_min_x[2] = poly_R10S[0][2]< poly_R10S[0][1] && poly_R10S[0][2]<poly_R10S[0][0];
-   	       unique case(one_hot_min_x)
-	       	      3'b001:begin
-			box_R10S[0][0]=poly_R10S[0][0];
-		      end
-		      3'b010:begin
-			box_R10S[0][0]=poly_R10S[0][1];
-		      end		      
-		      3'b100:begin
+		end
+		if(poly_R10S[0][1] > poly_R10S[0][2]) begin	//min X
 			box_R10S[0][0]=poly_R10S[0][2];
-		      end
-	       endcase
+		end
+		else begin
+			box_R10S[0][0]=poly_R10S[0][1];
+		end
+   end 
+   else begin
+		if(poly_R10S[0][1] >= poly_R10S[0][2]) begin	//max X
+			box_R10S[1][0]=poly_R10S[0][1];
+		end
+		else begin
+			box_R10S[1][0]=poly_R10S[0][2];
+		end
+		if(poly_R10S[0][0] > poly_R10S[0][2]) begin	//min X
+			box_R10S[0][0]=poly_R10S[0][2];
+		end
+		else begin
+			box_R10S[0][0]=poly_R10S[0][0];
+		end   
    end
-   //Mux for Max Y
-   always_comb begin
-   one_hot_max_y[0] = poly_R10S[1][0]>= poly_R10S[1][1] && poly_R10S[1][0]>=poly_R10S[1][2];
-   one_hot_max_y[1] = poly_R10S[1][1]> poly_R10S[1][0] && poly_R10S[1][1]>poly_R10S[1][2];
-   one_hot_max_y[2] = poly_R10S[1][2]> poly_R10S[1][1] && poly_R10S[1][2]>poly_R10S[1][0];
-   	       unique case(one_hot_max_y)
-	       	      3'b001:begin
-			box_R10S[1][1]=poly_R10S[1][0];
-		      end
-		      3'b010:begin
-			box_R10S[1][1]=poly_R10S[1][1];
-		      end		      
-		      3'b100:begin
-			box_R10S[1][1]=poly_R10S[1][2];
-		      end
-	       endcase
-   end
-   //Mux for Min Y
-   always_comb begin
-   one_hot_min_y[0] = poly_R10S[1][0]<= poly_R10S[1][1] && poly_R10S[1][0]<=poly_R10S[1][2];
-   one_hot_min_y[1] = poly_R10S[1][1]< poly_R10S[1][0] && poly_R10S[1][1]<poly_R10S[1][2];
-   one_hot_min_y[2] = poly_R10S[1][2]< poly_R10S[1][1] && poly_R10S[1][2]<poly_R10S[1][0];
-   	       unique case(one_hot_min_y)
-	       	      3'b001:begin
-			box_R10S[0][1]=poly_R10S[1][0];
-		      end
-		      3'b010:begin
-			box_R10S[0][1]=poly_R10S[1][1];
-		      end		      
-		      3'b100:begin
-			box_R10S[0][1]=poly_R10S[1][2];
-		      end
-	       endcase
 
+   if(poly_R10S[1][0]>= poly_R10S[1][1]) begin
+		if(poly_R10S[1][0]>= poly_R10S[1][2]) begin	//max y
+			box_R10S[1][1]=poly_R10S[1][0];
+		end
+		else begin
+			box_R10S[1][1]=poly_R10S[0][2];
+		end
+		if(poly_R10S[1][1] > poly_R10S[1][2]) begin	//min y
+			box_R10S[0][1]=poly_R10S[1][2];
+		end
+		else begin
+			box_R10S[0][1]=poly_R10S[1][1];
+		end
+   end 
+   else begin
+		if(poly_R10S[1][1] >= poly_R10S[1][2]) begin	//max y
+			box_R10S[1][1]=poly_R10S[1][1];
+		end
+		else begin
+			box_R10S[1][1]=poly_R10S[1][2];
+		end
+		if(poly_R10S[1][0] > poly_R10S[1][2]) begin	//min y
+			box_R10S[0][1]=poly_R10S[1][2];
+		end
+		else begin
+			box_R10S[0][1]=poly_R10S[1][0];
+		end   
+   end
+ 
    end
 
    //; }  
@@ -315,19 +307,19 @@ module `mname()`
    //       to a mask would allow you to do this operation
    //       as a bitwise and operation.
    always_comb begin
-    radix_mask_msb= {(`$radix`-3){1'b1}};
+//    radix_mask_msb= {(`$radix`-3){1'b1}};
     unique case (subSample_RnnnnU)
       	     4'b1000:begin
-	                radix_mask= {radix_mask_msb,3'b000};//
+	                radix_mask= {4'b1000, `$radix-4`'b0};//
 	     end	     
       	     4'b0100:begin
-	                radix_mask= {radix_mask_msb,3'b100};
+	                radix_mask= {4'b1100, `$radix-4`'b0};
 	     end	     
       	     4'b0010:begin
-	                radix_mask= {radix_mask_msb,3'b110};
+	                radix_mask= {4'b1110, `$radix-4`'b0};
 	     end	     
       	     4'b0001:begin
-	                radix_mask= {radix_mask_msb,3'b111};
+	                radix_mask= {4'b1111, `$radix-4`'b0};
 	     end	     
       endcase
    end
