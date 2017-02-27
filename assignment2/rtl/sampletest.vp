@@ -155,9 +155,9 @@ module  `mname()`
    	   edge_R16S[0][1][1]= poly_shift_R16S[1][1];
 //edge 1 start vertice
    	  //X
-   	   edge_R16S[1][0][0]= poly_shift_R16S[0][0];
+   	   edge_R16S[1][0][0]= poly_shift_R16S[1][0];
 	  //Y
-   	   edge_R16S[1][0][1]= poly_shift_R16S[0][1];
+   	   edge_R16S[1][0][1]= poly_shift_R16S[1][1];
    //edge 1 end vertice
    	  //X
    	   edge_R16S[1][1][0]= poly_shift_R16S[2][0];
@@ -166,14 +166,14 @@ module  `mname()`
 
 	  //edge 2 start vertice
    	  //X
-   	   edge_R16S[2][0][0]= poly_shift_R16S[1][0];
+   	   edge_R16S[2][0][0]= poly_shift_R16S[2][0];
 	  //Y
-   	   edge_R16S[2][0][1]= poly_shift_R16S[1][1];
+   	   edge_R16S[2][0][1]= poly_shift_R16S[2][1];
    //edge 2 end vertice
    	  //X
-   	   edge_R16S[2][1][0]= poly_shift_R16S[2][0];
+   	   edge_R16S[2][1][0]= poly_shift_R16S[0][0];
 	  //Y
-   	   edge_R16S[2][1][1]= poly_shift_R16S[2][1];
+   	   edge_R16S[2][1][1]= poly_shift_R16S[0][1];
    end
 
    //// (3) Calculate distance x_1 * y_2 - x_2 * y_1
