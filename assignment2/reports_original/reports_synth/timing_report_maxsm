@@ -1,0 +1,78 @@
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : rast
+Version: G-2012.06-SP5-1
+Date   : Fri Mar  3 18:03:58 2017
+****************************************
+
+ # A fanout number of 1000 was used for high fanout net computations.
+
+Operating Conditions: MLCOM   Library: tcbn45gsbwpml
+Wire Load Model Mode: top
+
+  Startpoint: hash_jtree/d_hash_f3/dff_1/dff/data_pipe_a_reg[1][17]
+              (rising edge-triggered flip-flop clocked by clk)
+  Endpoint: R_188_clk_r_REG16_S9
+            (rising edge-triggered flip-flop clocked by clk)
+  Path Group: clk
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  rast               TSMC32K_Lowk_Conservative
+                                           tcbn45gsbwpml
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock clk (rise edge)                                 0.0000     0.0000
+  clock network delay (ideal)                           0.0000     0.0000
+  hash_jtree/d_hash_f3/dff_1/dff/data_pipe_a_reg[1][17]/CP (DFCND4BWP)
+                                                        0.0000 #   0.0000 r
+  hash_jtree/d_hash_f3/dff_1/dff/data_pipe_a_reg[1][17]/Q (DFCND4BWP)
+                                                        0.0407     0.0407 f
+  U3583/ZN (DCCKND4BWP)                                 0.0080     0.0486 r
+  U6368/ZN (NR2XD2BWP)                                  0.0083     0.0570 f
+  U6373/ZN (OAI21D4BWP)                                 0.0137     0.0706 r
+  U9371/ZN (AOI21D4BWP)                                 0.0128     0.0834 f
+  U6307/ZN (OAI21D4BWP)                                 0.0181     0.1015 r
+  U6305/ZN (AOI211XD4BWP)                               0.0188     0.1204 f
+  U6309/ZN (OAI21D2BWP)                                 0.0142     0.1346 r
+  U6308/Z (CKXOR2D2BWP)                                 0.0271     0.1617 f
+  U3239/Z (DCCKBD12BWP)                                 0.0168     0.1785 f
+  U8556/Z (CKXOR2D2BWP)                                 0.0264     0.2048 r
+  U6068/ZN (ND2D8BWP)                                   0.0170     0.2218 f
+  U3426/ZN (OAI22D2BWP)                                 0.0157     0.2375 r
+  U5353/Z (XOR3D4BWP)                                   0.0486     0.2861 r
+  U3852/Z (XOR3D4BWP)                                   0.0285     0.3146 f
+  U3850/ZN (NR2XD2BWP)                                  0.0081     0.3227 r
+  U676/ZN (INVD3BWP)                                    0.0055     0.3282 f
+  U689/ZN (ND2D4BWP)                                    0.0050     0.3332 r
+  U3851/ZN (IOA21D2BWP)                                 0.0080     0.3412 f
+  U7875/S (FA1D2BWP)                                    0.0434     0.3845 r
+  U5184/Z (XOR3D4BWP)                                   0.0440     0.4285 r
+  U656/Z (XOR3D4BWP)                                    0.0287     0.4572 f
+  U655/ZN (NR2XD2BWP)                                   0.0110     0.4681 r
+  U654/ZN (NR2D4BWP)                                    0.0068     0.4750 f
+  U657/ZN (NR2XD4BWP)                                   0.0072     0.4822 r
+  U1277/ZN (OAI21D4BWP)                                 0.0116     0.4938 f
+  U1183/ZN (ND2D2BWP)                                   0.0064     0.5002 r
+  R_188_clk_r_REG16_S9/D (DFCNQD2BWP)                   0.0000     0.5002 r
+  data arrival time                                                0.5002
+
+  clock clk (rise edge)                                 0.5000     0.5000
+  clock network delay (ideal)                           0.0000     0.5000
+  R_188_clk_r_REG16_S9/CP (DFCNQD2BWP)                  0.0000     0.5000 r
+  library setup time                                   -0.0078     0.4922
+  data required time                                               0.4922
+  --------------------------------------------------------------------------
+  data required time                                               0.4922
+  data arrival time                                               -0.5002
+  --------------------------------------------------------------------------
+  slack (VIOLATED)                                                -0.0079
+
+
+1
