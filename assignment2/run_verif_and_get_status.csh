@@ -1,4 +1,9 @@
-setenv reports_dirc_verif_mayank reports_original_1
+setenv reports_dirc_verif_mayank reports_optimization_2
+
+
+setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:$PWD
+ln -s /usr/lib/x86_64-linux-gnu/libjpeg.so.8.0.2 libjpeg.so.62
+ln -s /usr/lib/x86_64-linux-gnu/libtiff.so.5.2.0 libtiff.so.3
 
 echo "Creating dir - $reports_dirc_verif_mayank"
 
@@ -43,3 +48,4 @@ diff sv_out_vec_271_${REF_FILE_PPM}.ppm /usr/class/ee271/project/vect/vec_271_${
 
 grep "uPoly / cycle :\|cycle / uPoly :" run_bb_0*.log | sed -e "s?.log:JJ: ?\t\t?" > Performance_results.rpt
 cd ..
+make dc_run CLK_PERIOD=0.5
