@@ -48,6 +48,10 @@ int rastBBox_bbox_check( int   v0_x,     //uPoly
   poly.v[3].x[1] = v3_y;
   poly.q = q;
 
+  //backface cull check add
+  int backfacing = ((v1_x - v0_x) * (v2_y - v1_y)) - ((v2_x - v1_x) * (v1_y - v0_y)) > 0;
+
+
   //
   //Copy Past C++ Bounding Box Function ****BEGIN****
   //
@@ -96,7 +100,7 @@ int rastBBox_bbox_check( int   v0_x,     //uPoly
   ll_y = ( !b_y[1] && !b_y[3] )                 ? poly.v[2].x[1] :  ll_y ;
   ll_y = ( !b_y[2] && !b_y[4] && !b_y[5] && q ) ? poly.v[3].x[1] :  ll_y ;
 
-  valid = (! ((ll_x > screen_w) || (ll_y > screen_h) || (ur_x < 0) || (ur_y < 0)) ) && valid_Poly; 
+  valid = (! ((ll_x > screen_w) || (ll_y > screen_h) || (ur_x < 0) || (ur_y < 0)) ) && valid_Poly && (!backfacing); 
 
 
   //Clamp BBox

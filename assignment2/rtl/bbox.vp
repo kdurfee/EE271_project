@@ -109,6 +109,9 @@
 //; my $pipe_depth = parameter(Name=>'PipelineDepth',
 //;                            Val=>3, Min=>1, Step=>1, 
 //;                            Doc=>"How many pipe stages are in this block");
+//; my $edges = ($verts == 3) ? 3 : 5 ;
+//; my $shortSF = $sig_fig;
+//; my $MRound = 2 * $shortSF - $radix;
 
 /* A Note on Signal Names:
  *
@@ -186,8 +189,12 @@ module `mname()`
    
    //////// DECLARE OTHER SIGNALS YOU NEED
    logic [`$radix-1`:0] radix_mask;
-   //R10 Signals
-   
+   //to detect back face culling early, before iterator wastes cycles
+   logic signed [`$sig_fig`:0]	 cull_sub[1:0][1:0];
+   logic signed [`$sig_fig`-8:0]	 cull_sub_cut[1:0][1:0];
+   logic signed [`$MRound`-1:0]       cull_dist;
+   logic backfacing;
+
    // output for retiming registers
    logic signed [`$sig_fig`-1:0] 	poly_R13S_retime[`$verts`-1:0][`$axis`-1:0]; // 4 Sets X,Y Fixed Point Values
    logic 				unsigned [`$sig_fig`-1:0] color_R13U_retime[`$colors`-1:0];        // Color of Poly
@@ -198,6 +205,21 @@ module `mname()`
    // output for retiming registers
 
 
+   //*********** Step 0: back face cull check ***********
+   //vertices subtractions
+   assign cull_sub[0][0]=poly_R10S[1][0] - poly_R10S[0][0];//x1-x0
+   assign cull_sub[0][1]=poly_R10S[2][1] - poly_R10S[1][1];//y2-y1
+   assign cull_sub[1][0]=poly_R10S[2][0] - poly_R10S[1][0];//x2-x1
+   assign cull_sub[1][1]=poly_R10S[1][1] - poly_R10S[0][1];//y1-y0
+   //working with small differences, we wont need all the bits
+   assign cull_sub_cut[0][0] = cull_sub[0][0][`$sig_fig`-8:0];
+   assign cull_sub_cut[0][1] = cull_sub[0][1][`$sig_fig`-8:0];
+   assign cull_sub_cut[1][0] = cull_sub[1][0][`$sig_fig`-8:0];
+   assign cull_sub_cut[1][1] = cull_sub[1][1][`$sig_fig`-8:0];
+   //multiply the differences
+   //check for back face cull (x1-x0)*(y2-y1)-(x2-x1)*(y1-y0) <= 0.
+   assign cull_dist = ((cull_sub_cut[0][0] * cull_sub_cut[0][1]) - (cull_sub_cut[1][0] * cull_sub_cut[1][1]));
+   assign backfacing = cull_dist > 0;
    // ********** Step 1:  Determining a Bounding Box ********** 
 
    //; # if( $verts == 4 ) {
@@ -342,7 +364,7 @@ module `mname()`
       out_box_R10S[1][1] = rounded_box_R10S[1][1] > screen_RnnnnS[1] ? screen_RnnnnS[1] : rounded_box_R10S[1][1];
       //the output is valid only if the min values are inside the max bounds
       //and the max values are inside the min bounds
-      outvalid_R10H = validPoly_R10H && ((out_box_R10S[0][0]<=screen_RnnnnS[0]) && (out_box_R10S[0][1]<=screen_RnnnnS[1])) && ((out_box_R10S[1][0]>=0) && (out_box_R10S[1][1]>=0));
+      outvalid_R10H = (~backfacing) && validPoly_R10H && ((out_box_R10S[0][0]<=screen_RnnnnS[0]) && (out_box_R10S[0][1]<=screen_RnnnnS[1])) && ((out_box_R10S[1][0]>=0) && (out_box_R10S[1][1]>=0));
       
    end
 
