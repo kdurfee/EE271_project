@@ -1,0 +1,79 @@
+ 
+****************************************
+Report : qor
+Design : rast
+Version: G-2012.06-SP5-1
+Date   : Sat Mar  4 09:35:46 2017
+****************************************
+
+
+  Timing Path Group 'clk'
+  -----------------------------------
+  Levels of Logic:              20.00
+  Critical Path Length:          0.49
+  Critical Path Slack:           0.00
+  Critical Path Clk Period:      0.50
+  Total Negative Slack:          0.00
+  No. of Violating Paths:        0.00
+  Worst Hold Violation:          0.00
+  Total Hold Violation:          0.00
+  No. of Hold Violations:        0.00
+  -----------------------------------
+
+
+  Cell Count
+  -----------------------------------
+  Hierarchical Cell Count:          1
+  Hierarchical Port Count:        731
+  Leaf Cell Count:              12821
+  Buf/Inv Cell Count:            2421
+  CT Buf/Inv Cell Count:            0
+  Combinational Cell Count:     10458
+  Sequential Cell Count:         2363
+  Macro Count:                      0
+  -----------------------------------
+
+
+  Area
+  -----------------------------------
+  Combinational Area:    17182.771440
+  Noncombinational Area: 10653.148835
+  Buf/Inv Area:           2316.308453
+  Net Area:                  0.000000
+  -----------------------------------
+  Cell Area:             27835.920275
+  Design Area:           27835.920275
+
+
+  Design Rules
+  -----------------------------------
+  Total Number of Nets:         13762
+  Nets With Violations:             3
+  Max Trans Violations:             2
+  Max Cap Violations:               2
+  Max Fanout Violations:            1
+  -----------------------------------
+
+
+  Hostname: corn15.stanford.edu
+
+  Compile CPU Statistics
+  -----------------------------------------
+  Resource Sharing:                   70.22
+  Logic Optimization:                 89.45
+  Mapping Optimization:              663.70
+  -----------------------------------------
+  Overall Compile Time:              837.38
+  Overall Compile Wall Clock Time:   843.69
+
+  --------------------------------------------------------------------
+
+  Design  WNS: 0.00  TNS: 0.00  Number of Violating Paths: 0
+
+
+  Design (Hold)  WNS: 0.00  TNS: 0.00  Number of Violating Paths: 0
+
+  --------------------------------------------------------------------
+
+
+1
