@@ -155,8 +155,6 @@ module `mname()`
    logic 				next_isQuad_R14H;                   
    logic 				next_validSamp_R14H;                 
    logic 				next_halt_RnnnnL;
-   logic 				halt_RnnnnL_flop;
-   assign halt_RnnnnL = halt_RnnnnL_flop || (~validPoly_R13H);
    
    
    // Instantiate registers for storing these states
@@ -198,7 +196,7 @@ module `mname()`
    `$d304->instantiate()` (
 			   .in({next_validSamp_R14H, next_isQuad_R14H, next_halt_RnnnnL}) , 
 			   .clk(clk) , .reset(rst), .en(1'b1),
-			   .out({validSamp_R14H, isQuad_R14H, halt_RnnnnL_flop}));
+			   .out({validSamp_R14H, isQuad_R14H, halt_RnnnnL}));
    // Instantiate registers for storing these states
    
 
@@ -306,7 +304,7 @@ module `mname()`
 	   next_poly_R14S      = back_to_back ? poly_R13S : poly_R14S;
 	   next_color_R14U     = back_to_back ? color_R13U: color_R14U;
 	   next_box_R14S       = back_to_back ? box_R13S: box_R14S;
-	   next_halt_RnnnnL    = !((~at_end_box_R14H));  //halt the pipeline until done processing
+	   next_halt_RnnnnL    = (at_end_box_R14H);  //halt the pipeline until done processing
 	end      
       endcase // case ( state_R14H )
       
