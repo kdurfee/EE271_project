@@ -127,6 +127,7 @@ module `mname()`
    //Control Signals
    input logic [3:0] 			subSample_RnnnnU , //Subsample width 
    output logic 			halt_RnnnnL , //Halt -> hold current micropoly
+   output logic 			rast_driver_eot_halt , //Halt -> hold current micropoly
    //Note that this block generates
    //Global Signals
    input logic 				clk, // Clock
@@ -155,6 +156,9 @@ module `mname()`
    logic 				next_isQuad_R14H;                   
    logic 				next_validSamp_R14H;                 
    logic 				next_halt_RnnnnL;
+   logic 				halt_RnnnnL_flop;
+   assign halt_RnnnnL = halt_RnnnnL_flop || (~validPoly_R13H);
+   assign rast_driver_eot_halt = halt_RnnnnL_flop;
    
    
    // Instantiate registers for storing these states
@@ -196,7 +200,7 @@ module `mname()`
    `$d304->instantiate()` (
 			   .in({next_validSamp_R14H, next_isQuad_R14H, next_halt_RnnnnL}) , 
 			   .clk(clk) , .reset(rst), .en(1'b1),
-			   .out({validSamp_R14H, isQuad_R14H, halt_RnnnnL}));
+			   .out({validSamp_R14H, isQuad_R14H, halt_RnnnnL_flop}));
    // Instantiate registers for storing these states
    
 
@@ -272,9 +276,6 @@ module `mname()`
    assign back_to_back = at_end_box_R14H && validPoly_R13H;
 
 
-
-
-
    
    //////
    ////// Then complete the following combinational logic defining the
@@ -288,11 +289,11 @@ module `mname()`
         ( WAIT_STATE ): begin
 	   next_sample_R14S    = box_R13S[0];
 	   next_validSamp_R14H = validPoly_R13H;	   
-	   next_isQuad_R14H    = isQuad_R13H;
+	   next_isQuad_R14H    = validPoly_R13H ? isQuad_R13H : isQuad_R14H;
 	   next_state_R14H     = validPoly_R13H ? TEST_STATE : WAIT_STATE; //if we get something valid jump to test
-	   next_poly_R14S      = poly_R13S;
-	   next_color_R14U     = color_R13U;
-	   next_box_R14S       = box_R13S;
+	   next_poly_R14S      = validPoly_R13H ? poly_R13S : poly_R14S;
+	   next_color_R14U     = validPoly_R13H ? color_R13U : color_R14U;
+	   next_box_R14S       = validPoly_R13H ? box_R13S : box_R14S;
 	   next_halt_RnnnnL    = ~validPoly_R13H; //if we get something valid, halt and jump to test state
 	end
 	( TEST_STATE ): begin
