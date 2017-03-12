@@ -120,7 +120,7 @@ module `mname()`
 
       sample_count = 0;
       sample_hit_count = 0;
-      micropolygon_count = 0;
+      micropolygon_count = 1;
       cycle_count = 0 ;
 
       @(negedge rst) ;

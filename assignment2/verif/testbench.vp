@@ -262,7 +262,7 @@ module `mname()`
 	//;                        Colors=>$colors,
 	//;                        PipelineDepth=>$delay_r2z_mon);
    `$perf_mon -> instantiate()` (
-	 		 .poly_R16S(`$dut_obj->get_instance_path()`.poly_R16S),           // 4 Sets X,Y Fixed Point Values
+	 		 .poly_R16S(`$dut_obj->get_instance_path()`.poly_R10S),           // 4 Sets X,Y Fixed Point Values
 			 .color_R16U(`$dut_obj->get_instance_path()`.color_R16U),         // Polygon Color
 			 .isQuad_R16H(`$dut_obj->get_instance_path()`.isQuad_R16H),       // Is Poly Quad?
 		 	 .validSamp_R16H(`$dut_obj->get_instance_path()`.validSamp_R16H), 

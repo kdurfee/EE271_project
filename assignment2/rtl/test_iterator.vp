@@ -127,7 +127,6 @@ module `mname()`
    //Control Signals
    input logic [3:0] 			subSample_RnnnnU , //Subsample width 
    output logic 			halt_RnnnnL , //Halt -> hold current micropoly
-   output logic 			rast_driver_eot_halt , //Halt -> hold current micropoly
    //Note that this block generates
    //Global Signals
    input logic 				clk, // Clock
@@ -156,9 +155,6 @@ module `mname()`
    logic 				next_isQuad_R14H;                   
    logic 				next_validSamp_R14H;                 
    logic 				next_halt_RnnnnL;
-   logic 				halt_RnnnnL_flop;
-   assign halt_RnnnnL = halt_RnnnnL_flop || (~validPoly_R13H);
-   assign rast_driver_eot_halt = halt_RnnnnL_flop;
    
    
    // Instantiate registers for storing these states
@@ -200,7 +196,7 @@ module `mname()`
    `$d304->instantiate()` (
 			   .in({next_validSamp_R14H, next_isQuad_R14H, next_halt_RnnnnL}) , 
 			   .clk(clk) , .reset(rst), .en(1'b1),
-			   .out({validSamp_R14H, isQuad_R14H, halt_RnnnnL_flop}));
+			   .out({validSamp_R14H, isQuad_R14H, halt_RnnnnL}));
    // Instantiate registers for storing these states
    
 
