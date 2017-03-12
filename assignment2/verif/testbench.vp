@@ -66,7 +66,7 @@ module `mname()`
 (
      // Output Signals (to DUT inputs)
      output logic signed   [`$sig_fig`-1:0]  poly_R10S[`$verts`-1:0][`$axis`-1:0] , // Poly Position
-     output logic unsigned [`$sig_fig`-1:0]  color_R10U[`$colors`-1:0] ,         // Color of Poly
+     output logic unsigned [`$sig_fig`-1:0]  color_R10U[1:0][`$colors`-1:0] ,         // Color of Poly
      output logic 	                isQuad_R10H ,                    // Is Poly Quad?
      output logic 	                validPoly_R10H ,                 // Valid Data for Operation
 
@@ -264,7 +264,7 @@ module `mname()`
    `$perf_mon -> instantiate()` (
 	 		 .poly_R16S(`$dut_obj->get_instance_path()`.poly_R10S),           // 4 Sets X,Y Fixed Point Values
 			 .color_R16U(`$dut_obj->get_instance_path()`.color_R16U),         // Polygon Color
-			 .isQuad_R16H(`$dut_obj->get_instance_path()`.isQuad_R16H),       // Is Poly Quad?
+			 .isQuad_R16H(`$dut_obj->get_instance_path()`.isQuad_R10H),       // Is Poly Quad?
 		 	 .validSamp_R16H(`$dut_obj->get_instance_path()`.validSamp_R16H), 
 			 .sample_R16S(`$dut_obj->get_instance_path()`.sample_R16S),       // Will change for JIT -todo
 			      
