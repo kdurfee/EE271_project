@@ -125,7 +125,7 @@ module `mname()`
    `$bbox -> instantiate()` (
 			     .poly_R10S(poly_R10S) ,
 			     .color_R10U(color_R10U) ,	      
-			     .isQuad_R10H(isQuad_R10H) ,
+			     .isQuad_R10H(1'b0) , //not supported
 			     .validPoly_R10H(validPoly_R10H) ,
       
 			     .halt_RnnnnL(halt_RnnnnL) , 
