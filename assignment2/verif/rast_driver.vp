@@ -97,6 +97,8 @@ module `mname()`
    int vert_0_match;
    int vert_1_match;
    int vert_2_match;
+   int normal_0;
+   int normal_1;
 
    logic 	      TestFinish ;
 
@@ -245,42 +247,75 @@ module `mname()`
 			    tmp_poly_R10S_2[1][0], tmp_poly_R10S_2[1][1], tmp_poly_R10S_2[1][2],
 			    tmp_poly_R10S_2[2][0], tmp_poly_R10S_2[2][1], tmp_poly_R10S_2[2][2],
 			    tmp_poly_R10S_2[3][0], tmp_poly_R10S_2[3][1], tmp_poly_R10S_2[3][2],
-			    tmp_color_R10U_2[0],   tmp_color_R10U_2[1],   tmp_color_R10U_2[2] );		
-   		vert_0_match = (tmp_poly_R10S_2[0][0] == tmp_poly_R10S[0][0] && tmp_poly_R10S_2[0][1] == tmp_poly_R10S[0][1]) ||
-			     (tmp_poly_R10S_2[0][0] == tmp_poly_R10S[1][0] && tmp_poly_R10S_2[0][1] == tmp_poly_R10S[1][1]) ||
-			     (tmp_poly_R10S_2[0][0] == tmp_poly_R10S[2][0] && tmp_poly_R10S_2[0][1] == tmp_poly_R10S[2][1]);
-		vert_1_match = (tmp_poly_R10S_2[1][0] == tmp_poly_R10S[0][0] && tmp_poly_R10S_2[1][1] == tmp_poly_R10S[0][1]) ||
-			     (tmp_poly_R10S_2[1][0] == tmp_poly_R10S[1][0] && tmp_poly_R10S_2[1][1] == tmp_poly_R10S[1][1]) ||
-			     (tmp_poly_R10S_2[1][0] == tmp_poly_R10S[2][0] && tmp_poly_R10S_2[1][1] == tmp_poly_R10S[2][1]);
-		vert_2_match = (tmp_poly_R10S_2[2][0] == tmp_poly_R10S[0][0] && tmp_poly_R10S_2[2][1] == tmp_poly_R10S[0][1]) ||
-			     (tmp_poly_R10S_2[2][0] == tmp_poly_R10S[1][0] && tmp_poly_R10S_2[2][1] == tmp_poly_R10S[1][1]) ||
-			     (tmp_poly_R10S_2[2][0] == tmp_poly_R10S[2][0] && tmp_poly_R10S_2[2][1] == tmp_poly_R10S[2][1]);
-		if((vert_0_match && vert_1_match) || (vert_1_match && vert_2_match) || (vert_0_match &&vert_2_match))begin
+			    tmp_color_R10U_2[0],   tmp_color_R10U_2[1],   tmp_color_R10U_2[2] );		   		
+			    //note that the only case found in stimulus is when 0 and 2 match 
+                 vert_0_match = (tmp_poly_R10S_2[2][0] == tmp_poly_R10S[2][0] && tmp_poly_R10S_2[2][1] == tmp_poly_R10S[2][1]
+		 && tmp_poly_R10S_2[0][0] == tmp_poly_R10S[1][0]&& tmp_poly_R10S_2[0][1] == tmp_poly_R10S[1][1]);
+		 //||
+		 //(tmp_poly_R10S_2[2][0] == tmp_poly_R10S[1][0] && tmp_poly_R10S_2[2][1] == tmp_poly_R10S[1][1]
+		 //&& tmp_poly_R10S_2[0][0] == tmp_poly_R10S[2][0]&& tmp_poly_R10S_2[0][1] == tmp_poly_R10S[2][1]);
+		 vert_1_match = //(tmp_poly_R10S_2[2][0] == tmp_poly_R10S[2][0] && tmp_poly_R10S_2[2][1] == tmp_poly_R10S[2][1]
+		 //&& tmp_poly_R10S_2[0][0] == tmp_poly_R10S[0][0]&& tmp_poly_R10S_2[0][1] == tmp_poly_R10S[0][1])
+		 //||
+		 (tmp_poly_R10S_2[2][0] == tmp_poly_R10S[0][0] && tmp_poly_R10S_2[2][1] == tmp_poly_R10S[0][1]
+		 && tmp_poly_R10S_2[0][0] == tmp_poly_R10S[2][0]&& tmp_poly_R10S_2[0][1] == tmp_poly_R10S[2][1]);
+		 vert_2_match = (tmp_poly_R10S_2[2][0] == tmp_poly_R10S[1][0] && tmp_poly_R10S_2[2][1] == tmp_poly_R10S[1][1]
+		 && tmp_poly_R10S_2[0][0] == tmp_poly_R10S[0][0]&& tmp_poly_R10S_2[0][1] == tmp_poly_R10S[0][1]);
+		 //||
+		 //(tmp_poly_R10S_2[2][0] == tmp_poly_R10S[0][0] && tmp_poly_R10S_2[2][1] == tmp_poly_R10S[0][1]
+		 //&& tmp_poly_R10S_2[0][0] == tmp_poly_R10S[1][0]&& tmp_poly_R10S_2[0][1] == tmp_poly_R10S[1][1]);		
+		normal_0 = ((tmp_poly_R10S[1][0]-tmp_poly_R10S[0][0]) * (tmp_poly_R10S[2][1]-tmp_poly_R10S[1][1])) 
+		- 
+		((tmp_poly_R10S[2][0] - tmp_poly_R10S[1][0]) * (tmp_poly_R10S[1][1] - tmp_poly_R10S[0][1]));
+		normal_1 = ((tmp_poly_R10S_2[1][0]-tmp_poly_R10S_2[0][0]) * (tmp_poly_R10S_2[2][1]-tmp_poly_R10S_2[1][1])) 
+		- 
+		((tmp_poly_R10S_2[2][0] - tmp_poly_R10S_2[1][0]) * (tmp_poly_R10S_2[1][1] - tmp_poly_R10S_2[0][1]));
+		//if((validPoly_1 && validPoly_2) && (vert_0_match || vert_1_match || vert_2_match))begin
+		if((validPoly_1 && validPoly_2) && (vert_2_match) && (normal_0<=0 && normal_1<=0))begin
 		    //we can combine these two
 		    validPoly_R10H=validPoly_1;
 		    num_vertices=4;
 		    isQuad_R10H = (num_vertices==4) ? 1'b1:1'b0;	    
-		    poly_R10S[0][0] = tmp_poly_R10S[0][0] ;
-	       	    poly_R10S[0][1] = tmp_poly_R10S[0][1] ;
-	       	    poly_R10S[0][2] = tmp_poly_R10S[0][2] ;
-		    poly_R10S[1][0] = tmp_poly_R10S[1][0] ;
-	       	    poly_R10S[1][1] = tmp_poly_R10S[1][1] ;
-	       	    poly_R10S[1][2] = tmp_poly_R10S[1][2] ;
-		    poly_R10S[2][0] = tmp_poly_R10S[2][0] ;
-	       	    poly_R10S[2][1] = tmp_poly_R10S[2][1] ;
-	       	    poly_R10S[2][2] = tmp_poly_R10S[2][2] ;
-		    if(vert_0_match && vert_1_match)begin
-			poly_R10S[3][0] = tmp_poly_R10S_2[2][0] ; 
-	       	    	poly_R10S[3][1] = tmp_poly_R10S_2[2][1] ;
-	       	    	poly_R10S[3][2] = tmp_poly_R10S_2[2][2] ;
-		    end else if (vert_1_match && vert_2_match)begin
-		    	poly_R10S[3][0] = tmp_poly_R10S_2[0][0] ; 
-	       	    	poly_R10S[3][1] = tmp_poly_R10S_2[0][1] ;
-	       	    	poly_R10S[3][2] = tmp_poly_R10S_2[0][2] ;
-		    end else begin
-		    	poly_R10S[3][0] = tmp_poly_R10S_2[1][0] ; 
-	       	    	poly_R10S[3][1] = tmp_poly_R10S_2[1][1] ;
-	       	    	poly_R10S[3][2] = tmp_poly_R10S_2[1][2] ;
+		    
+		    if(vert_2_match)begin
+			poly_R10S[0][0] = tmp_poly_R10S[2][0] ;
+	       	    	poly_R10S[0][1] = tmp_poly_R10S[2][1] ;
+	       	    	poly_R10S[0][2] = tmp_poly_R10S[2][2] ;
+		    	poly_R10S[1][0] = tmp_poly_R10S[0][0] ;
+	       	    	poly_R10S[1][1] = tmp_poly_R10S[0][1] ;
+	       	    	poly_R10S[1][2] = tmp_poly_R10S[0][2] ;
+		    	poly_R10S[2][0] = tmp_poly_R10S_2[1][0] ;
+	       	    	poly_R10S[2][1] = tmp_poly_R10S_2[1][1] ;
+	       	    	poly_R10S[2][2] = tmp_poly_R10S_2[1][2] ;
+			poly_R10S[3][0] = tmp_poly_R10S[1][0] ; 
+	       	    	poly_R10S[3][1] = tmp_poly_R10S[1][1] ;
+	       	    	poly_R10S[3][2] = tmp_poly_R10S[1][2] ;
+		    end else if (vert_0_match)begin
+		    	poly_R10S[0][0] = tmp_poly_R10S[0][0] ;
+	       	    	poly_R10S[0][1] = tmp_poly_R10S[0][1] ;
+	       	    	poly_R10S[0][2] = tmp_poly_R10S[0][2] ;
+		    	poly_R10S[1][0] = tmp_poly_R10S[1][0] ;
+	       	    	poly_R10S[1][1] = tmp_poly_R10S[1][1] ;
+	       	    	poly_R10S[1][2] = tmp_poly_R10S[1][2] ;
+		    	poly_R10S[2][0] = tmp_poly_R10S_2[1][0] ;
+	       	    	poly_R10S[2][1] = tmp_poly_R10S_2[1][1] ;
+	       	    	poly_R10S[2][2] = tmp_poly_R10S_2[1][2] ;
+		    	poly_R10S[3][0] = tmp_poly_R10S[2][0] ; 
+	       	    	poly_R10S[3][1] = tmp_poly_R10S[2][1] ;
+	       	    	poly_R10S[3][2] = tmp_poly_R10S[2][2] ;
+		    end else begin	
+		    	poly_R10S[0][0] = tmp_poly_R10S[1][0] ;
+	       	    	poly_R10S[0][1] = tmp_poly_R10S[1][1] ;
+	       	    	poly_R10S[0][2] = tmp_poly_R10S[1][2] ;
+		    	poly_R10S[1][0] = tmp_poly_R10S[2][0] ;
+	       	    	poly_R10S[1][1] = tmp_poly_R10S[2][1] ;
+	       	    	poly_R10S[1][2] = tmp_poly_R10S[2][2] ;
+		    	poly_R10S[2][0] = tmp_poly_R10S_2[1][0] ;
+	       	    	poly_R10S[2][1] = tmp_poly_R10S_2[1][1] ;
+	       	    	poly_R10S[2][2] = tmp_poly_R10S_2[1][2] ;
+		    	poly_R10S[3][0] = tmp_poly_R10S[0][0] ; 
+	       	    	poly_R10S[3][1] = tmp_poly_R10S[0][1] ;
+	       	    	poly_R10S[3][2] = tmp_poly_R10S[0][2] ;
 		    end
 		    color_R10U[0][0] = tmp_color_R10U[0];
 	    	    color_R10U[0][1] = tmp_color_R10U[1];
