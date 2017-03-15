@@ -82,9 +82,12 @@ module `mname()`
      input logic                       halt_RnnnnL,
  
      // Input Signals (from DUT outputs)
-     input logic signed   [`$sig_fig`-1:0] hit_R18S[`$axis`-1:0],       // Hit Location
-     input logic unsigned [`$sig_fig`-1:0] color_R18U[`$colors`-1:0] ,  // Color of Poly 
-     input logic                       hit_valid_R18H            // Is this a hit?
+     input logic signed   [`$sig_fig`-1:0] hit_R18S_1[`$axis`-1:0],       // Hit Location
+     input logic unsigned [`$sig_fig`-1:0] color_R18U_1[`$colors`-1:0] ,  // Color of Poly 
+     input logic                       hit_valid_R18H_1,            // Is this a hit?
+   // Input Signals (from DUT outputs)
+     input logic signed   [`$sig_fig`-1:0] hit_R18S_2[`$axis`-1:0],       // Hit Location
+     input logic                       hit_valid_R18H_2            // Is this a hit?
 );
 
    // Some simulation variables
@@ -149,9 +152,11 @@ module `mname()`
       .subSample_RnnnnU(subSample_RnnnnU),   // Output: SubSample_Interval
       .ss_w_lg2_RnnnnS(ss_w_lg2_RnnnnS),
       
-     .hit_R18S(hit_R18S),             //Sample Location and depth
-      .color_R18U(color_R18U),         //Color of Sample Hit
-      .hit_valid_R18H(hit_valid_R18H)  //Is sample hit valid
+      .hit_R18S_1(hit_R18S_1),             //Sample Location and depth
+      .color_R18U_1(color_R18U_1),         //Color of Sample Hit
+      .hit_valid_R18H_1(hit_valid_R18H_1),  //Is sample hit valid
+      .hit_R18S_2(hit_R18S_2),             //Sample Location and depth
+      .hit_valid_R18H_2(hit_valid_R18H_2)  //Is sample hit valid
       );
 
    
@@ -197,18 +202,18 @@ module `mname()`
 	//;                        PipelineDepth=>$delay_r2z_sb,
 	//;                        Filename=>"sb_log/smpl_sb.log");
    `$smpl_sb -> instantiate()` (
-	 		 .poly_R16S(`$dut_obj->get_instance_path()`.poly_R16S),           // 4 Sets X,Y Fixed Point Values
-			 .color_R16U(`$dut_obj->get_instance_path()`.color_R16U),         // Polygon Color
-			 .isQuad_R16H(`$dut_obj->get_instance_path()`.isQuad_R16H),       // Is Poly Quad?
-		 	 .validSamp_R16H(`$dut_obj->get_instance_path()`.validSamp_R16H), 
-			 .sample_R16S(`$dut_obj->get_instance_path()`.sample_R16S),       // Will change for JIT -todo
+	 		 .poly_R16S(`$dut_obj->get_instance_path()`.poly_R16S_1),           // 4 Sets X,Y Fixed Point Values
+			 .color_R16U(`$dut_obj->get_instance_path()`.color_R16U_1),         // Polygon Color
+			 .isQuad_R16H(`$dut_obj->get_instance_path()`.isQuad_R16H_1),       // Is Poly Quad?
+		 	 .validSamp_R16H(`$dut_obj->get_instance_path()`.validSamp_R16H_1), 
+			 .sample_R16S(`$dut_obj->get_instance_path()`.sample_R16S_1),       // Will change for JIT -todo
 			      
   			 .clk(clk),                // Clock 
  			 .rst(rst),                // Reset
 			 
-			 .hit_R18S(hit_R18S),
-			 .color_R18U(color_R18U),         // Polygon Color			      
-			 .hit_valid_R18H(hit_valid_R18H) 
+			 .hit_R18S(hit_R18S_1),
+			 .color_R18U(color_R18U_1),         // Polygon Color			      
+			 .hit_valid_R18H(hit_valid_R18H_1) 
 								   
 			  );
 			  
@@ -222,18 +227,18 @@ module `mname()`
 	//;                        PipelineDepth=>$delay_r2z_sb+1,
 	//;                        Filename=>"sb_log/smpl_cnt_sb.log");
    `$smpl_cnt_sb -> instantiate()` (
-	 		 .poly_R16S(`$dut_obj->get_instance_path()`.poly_R16S),           // 4 Sets X,Y Fixed Point Values
-			 .color_R16U(`$dut_obj->get_instance_path()`.color_R16U),         // Polygon Color
-			 .isQuad_R16H(`$dut_obj->get_instance_path()`.isQuad_R16H),       // Is Poly Quad?
-		 	 .validSamp_R16H(`$dut_obj->get_instance_path()`.validSamp_R16H), 
-			 .sample_R16S(`$dut_obj->get_instance_path()`.sample_R16S),       // Will change for JIT -todo
+	 		 .poly_R16S(`$dut_obj->get_instance_path()`.poly_R16S_1),           // 4 Sets X,Y Fixed Point Values
+			 .color_R16U(`$dut_obj->get_instance_path()`.color_R16U_1),         // Polygon Color
+			 .isQuad_R16H(`$dut_obj->get_instance_path()`.isQuad_R16H_1),       // Is Poly Quad?
+		 	 .validSamp_R16H(`$dut_obj->get_instance_path()`.validSamp_R16H_1), 
+			 .sample_R16S(`$dut_obj->get_instance_path()`.sample_R16S_1),       // Will change for JIT -todo
 			      
   			 .clk(clk),                // Clock 
  			 .rst(rst),                // Reset
 			 
-			 .hit_R18S(hit_R18S),
-			 .color_R18U(color_R18U),         // Polygon Color			      
-			 .hit_valid_R18H(hit_valid_R18H) ,
+			 .hit_R18S(hit_R18S_1),
+			 .color_R18U(color_R18U_1),         // Polygon Color			      
+			 .hit_valid_R18H(hit_valid_R18H_1) ,
 
 		 	 .screen_RnnnnS(screen_RnnnnS),         // Screen Size
 	                 .subSample_RnnnnU(subSample_RnnnnU),    // Flag for subsample
@@ -263,17 +268,18 @@ module `mname()`
 	//;                        PipelineDepth=>$delay_r2z_mon);
    `$perf_mon -> instantiate()` (
 	 		 .poly_R16S(`$dut_obj->get_instance_path()`.poly_R10S),           // 4 Sets X,Y Fixed Point Values
-			 .color_R16U(`$dut_obj->get_instance_path()`.color_R16U),         // Polygon Color
+			 .color_R16U(`$dut_obj->get_instance_path()`.color_R16U_1),         // Polygon Color
 			 .isQuad_R16H(`$dut_obj->get_instance_path()`.isQuad_R10H),       // Is Poly Quad?
-		 	 .validSamp_R16H(`$dut_obj->get_instance_path()`.validSamp_R16H), 
-			 .sample_R16S(`$dut_obj->get_instance_path()`.sample_R16S),       // Will change for JIT -todo
+		 	 .validSamp_R16H(`$dut_obj->get_instance_path()`.validSamp_R16H_1), 
+			 .sample_R16S(`$dut_obj->get_instance_path()`.sample_R16S_1),       // Will change for JIT -todo
 			      
   			 .clk(clk),                // Clock 
  			 .rst(rst),                // Reset
 			 
-			 .hit_R18S(hit_R18S),
-			 .color_R18U(`$dut_obj->get_instance_path()`.color_R18U),         // Polygon Color			      
-			 .hit_valid_R18H(hit_valid_R18H) 
+			 .hit_R18S(hit_R18S_1),
+			 .color_R18U(`$dut_obj->get_instance_path()`.color_R18U_1),         // Polygon Color			      
+			 .hit_valid_R18H_1(hit_valid_R18H_1), 
+			 .hit_valid_R18H_2(hit_valid_R18H_2) 
 									   );
 									   
 									   
@@ -356,18 +362,18 @@ module `mname()`
 	//;                        PipelineDepth=>$delay_r2z_mon,
 	//;                        Filename=>"mon_log/rst2zbuff.log");
    `$rst2zbuff_mon -> instantiate()` (
-	 		 .poly_R16S(`$dut_obj->get_instance_path()`.poly_R16S),           // 4 Sets X,Y Fixed Point Values
-			 .color_R16U(`$dut_obj->get_instance_path()`.color_R16U),         // Polygon Color
-			 .isQuad_R16H(`$dut_obj->get_instance_path()`.isQuad_R16H),       // Is Poly Quad?
-		 	 .validSamp_R16H(`$dut_obj->get_instance_path()`.validSamp_R16H), 
-			 .sample_R16S(`$dut_obj->get_instance_path()`.sample_R16S),       // Will change for JIT -todo
+	 		 .poly_R16S(`$dut_obj->get_instance_path()`.poly_R16S_1),           // 4 Sets X,Y Fixed Point Values
+			 .color_R16U(`$dut_obj->get_instance_path()`.color_R16U_1),         // Polygon Color
+			 .isQuad_R16H(`$dut_obj->get_instance_path()`.isQuad_R16H_1),       // Is Poly Quad?
+		 	 .validSamp_R16H(`$dut_obj->get_instance_path()`.validSamp_R16H_1), 
+			 .sample_R16S(`$dut_obj->get_instance_path()`.sample_R16S_1),       // Will change for JIT -todo
 			      
   			 .clk(clk),                // Clock 
  			 .rst(rst),                // Reset
 			 
-			 .hit_R18S(hit_R18S),
-			 .color_R18U(`$dut_obj->get_instance_path()`.color_R18U),         // Polygon Color			      
-			 .hit_valid_R18H(hit_valid_R18H) 
+			 .hit_R18S(hit_R18S_1),
+			 .color_R18U(`$dut_obj->get_instance_path()`.color_R18U_1),         // Polygon Color			      
+			 .hit_valid_R18H(hit_valid_R18H_1) 
 									   
 									   );
 	//; }
@@ -468,8 +474,8 @@ module `mname()`
             $vcdplusmemon(0,sampletest_scoreboard); //
             $vcdplusmemon(0,sampletest_count_scoreboard); //
 
-	    $vcdplusmemon(0,`$zbuff->iname()`.hit_R18S); //
-	    $vcdplusmemon(0,`$zbuff->iname()`.color_R18U); //
+	    $vcdplusmemon(0,`$zbuff->iname()`.hit_R18S_1); //
+	    $vcdplusmemon(0,`$zbuff->iname()`.color_R18U_1); //
 	    $vcdplusmemon(0,`$zbuff->iname()`.color); //
 	    $vcdpluson(0,zbuff); //
             */
